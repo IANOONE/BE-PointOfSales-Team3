@@ -1,7 +1,7 @@
 const { body, validationResult } = require("express-validator")
 const db = require("../models")
 const User = db.user
-const validationRules =  () => {
+const userValidationRules =  () => {
     return [
         body('username').custom(async (val)=> {
             return await User.findOne({
@@ -40,7 +40,7 @@ const validationRules =  () => {
     ]
 }
 
-const validate = (req,res,next) => {
+const validateUser = (req,res,next) => {
     const errors = validationResult(req)
 
     if(!errors.isEmpty()){
@@ -54,4 +54,4 @@ const validate = (req,res,next) => {
 }
 
 
-module.exports = {validate, validationRules}
+module.exports = {validateUser, userValidationRules}
