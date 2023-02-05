@@ -25,9 +25,9 @@ const fileUploader = ({
             }
             cb(null, true)
         },
-        limits : {
-            fileSize :5000
-        },
+        // limits : {
+        //     fileSize :10000
+        // },
     })
 
     return uploader

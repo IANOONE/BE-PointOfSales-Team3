@@ -8,5 +8,7 @@ const uploadSingle = fileUploader({destinationFolder : "products_img"}).single('
 
 
 router.post("/create", uploadSingle , productController.create)
+router.patch("/edit/:id", uploadSingle , productController.edit)
+router.get("/list", productController.fetchProduct)
 
 module.exports = router

@@ -16,6 +16,7 @@ app.use(express.urlencoded({extended: false}))
 app.use("/image", express.static(`${__dirname}/public/products_img`))
 app.use("/auth",route.authRoute)
 app.use("/product",route.productRoute)
+app.use("/category",route.categoryRoute)
 
 app.listen(PORT, ()=> {
     console.log(`API is running on PORT ${PORT}`);
