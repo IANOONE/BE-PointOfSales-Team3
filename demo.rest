@@ -1,0 +1,16 @@
+###
+POST http://localhost:2000/auth/login
+Content-Type: application/json
+
+{
+   "userLog" : "test123",
+   "password": "password12345"
+}
+
+###
+GET http://localhost:2000/auth/token
+
+
+###
+GET  http://localhost:2000/auth/userList
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6InRlc3Rlc3QiLCJwaG9uZV9udW1iZXIiOiI1ODQ5ODUwNTE4IiwiZW1haWwiOiJ0ZXN0QGdtYWlsLmNvbSIsInVzZXJuYW1lIjoidGVzdDEyMyIsImlzQWRtaW4iOmZhbHNlLCJjcmVhdGVkQXQiOiIyMDIzLTAyLTAyVDE1OjA4OjI0LjAwMFoiLCJ1cGRhdGVkQXQiOiIyMDIzLTAyLTA2VDEyOjAxOjUzLjAwMFoiLCJpYXQiOjE2NzU2ODQ5NDEsImV4cCI6MTY3NTY4NDk1Nn0.ju0YLv0A0dUw0uRmRr1URskefs5U5lDkR2-kVyDUCp0

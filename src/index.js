@@ -1,16 +1,18 @@
 const express = require("express")
 const app = express()
+const cookie_parser = require('cookie-parser')
 const dotenv = require("dotenv").config()
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 2000
 const route = require("./routes")
 const db = require("./models")
 const {sequelize} = require("./models")
 
 
+app.use(cookie_parser())
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))
 
-// db.sequelize.sync({alter:true})
+// db.sequelize.sync({alter:true})  
 
 
 app.use("/image", express.static(`${__dirname}/public/products_img`))
