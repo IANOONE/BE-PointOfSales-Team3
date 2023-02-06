@@ -32,7 +32,6 @@ const authController = {
         console.log(req.body);
         const {userLog, password} = req.body
 
-        const t = await sequelize.transaction();
         try {
             // get data user by user
         const result = await User.findOne({
@@ -49,7 +48,8 @@ const authController = {
                     }
                 ]
             }
-        }, {transaction : t})
+        })
+        
         
         if(!result){
             throw new Error('Login failed. Email/username/phone number is not registered')
@@ -57,22 +57,25 @@ const authController = {
         //verify password and comparing with decrypted password
         const verifyPass = bcrypt.compareSync(password, result.password)
 
+        
         if(!verifyPass){
             throw new Error('Password is wrong')
         }
+        delete result.dataValues.password
+        console.log(result);
+
 
         const token = jwt.sign({...result}, process.env.secret_key, {expiresIn: "8h"})
         
-        res.status(200).send(token)
+        res.status(200).json({
+            token : token,
+            data: result
+        })
 
-        await t.commit();
 
         } catch(error) {
         console.log(error);
         res.status(400).send(error.toString())
-        if(t){
-        await t.rollback();
-        }
         }
     }
 }

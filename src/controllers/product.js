@@ -5,8 +5,14 @@ const { Op } = require("sequelize")
 
 const productController = {
     create: async (req,res) => {
-        console.log(req.body);
+        // console.log(req.body);
         // get filename
+        console.log(req.file);
+
+        // if(req.file.fieldname != "image"){
+        //     return new Error(`Format file must an image`)
+        // }
+
         let fileName = req.file.filename
         const url = "localhost:2000/image/"
         // rewrite filename and add url
@@ -19,8 +25,8 @@ const productController = {
                 ...req.body,
                 image : fileName
             }
-            console.log(data);
-            await Product.create({...data}, { transaction: t })
+            // console.log(data);
+            // await Product.create({...data}, { transaction: t })
 
             await t.commit();
             res.status(200).send("Success add new product")
