@@ -5,5 +5,6 @@ const {categoryValidateRules, validate} = require("../middlewares/validator")
 
 router.post("/create", categoryValidateRules(), validate, categoryController.create)
 router.patch("/edit/:id", categoryController.edit)
+router.delete("/delete/:id", categoryController.delete)
 
 module.exports = router

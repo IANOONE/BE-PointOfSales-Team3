@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     refresh_token: DataTypes.TEXT
   }, {
     sequelize,
+    paranoid: true,
     modelName: 'User',
   });
   return User;

@@ -6,17 +6,6 @@ const User = db.user
 
 const userValidateRules =  () => {
     return [
-        body('username').custom(async (val)=> {
-            return await User.findOne({
-                where: {
-                    username : val
-                }
-            }).then(user => {
-                if(user){
-                    return Promise.reject('Username already registered')
-                }
-            })
-        }),
         body('phone_number').isNumeric().withMessage("Phone number should be a numbers").custom(async (val)=> {
             return await User.findOne({
                 where: {

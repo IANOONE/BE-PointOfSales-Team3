@@ -24,8 +24,8 @@ const authController = {
             console.log(data);
             const result = await User.create({...data})
             res.status(200).send(result)
-        }catch(error){
-            res.status(400).send(error)
+        }catch(err){
+            res.status(400).send(err.message)
         }
     },
     login: async (req,res) => {
@@ -62,14 +62,15 @@ const authController = {
         const result = {
             ...user.dataValues
         }
-    
-        delete result.email
-        delete result.phone_number
-        delete result.password
-        delete result.refresh_token
+
+        const arrDelete = ['email', 'phone_number', 'password', 'refresh_token', 'createdAt', 'updatedAt', 'deletedAt' ]
+        arrDelete.forEach(e => {
+            delete result[e]
+        });
+
         console.log(result);
 
-        const accessToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "15s"})
+        const accessToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "5m"})
 
         const refreshToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "1h"})
         
@@ -90,9 +91,9 @@ const authController = {
             // data: result
         })
 
-        } catch(error) {
-        console.log(error);
-        res.status(400).send(error.toString())
+        } catch(err) {
+        console.log(err);
+        res.status(400).send(err.message)
         }
     },
     refreshToken: async (req,res) => {
@@ -112,9 +113,10 @@ const authController = {
             const data = {
                 ...user.dataValues
             }
-            delete data.email
-            delete data.password
-            delete data.refresh_token
+            const arrDelete = ['email', 'phone_number', 'password', 'refresh_token', 'createdAt', 'updatedAt', 'deletedAt' ]
+            arrDelete.forEach(e => {
+                delete data[e]
+            });
             
             const accessToken = jwt.sign({...data}, process.env.secret_key, {expiresIn: '5m'})
 
@@ -123,7 +125,7 @@ const authController = {
             })
 
         } catch(err){
-            return res.status(400).send(err)
+            return res.status(400).send(err.message)
         }
     },
     logout: async (req,res) => {
@@ -144,7 +146,7 @@ const authController = {
             res.clearCookie('refreshToken')
             res.status(200).send("success logout")
         } catch(err){
-            return res.status(400).send(err)
+            return res.status(400).send(err.message)
         }
     },
     fetchAllEmployee: async (req,res) => {
@@ -159,7 +161,7 @@ const authController = {
                 data: result
             })
         } catch (err) {
-            return res.status(400).send(err)
+            return res.status(400).send(err.message)
         }
     },
     fetchDataEmployee: async (req,res) => {
@@ -182,7 +184,7 @@ const authController = {
 
             res.status(200).json({...data})
         }catch (err) {
-            return res.status(400).send(err)
+            return res.status(400).send(err.message)
         }
     },
     editEmployee: async (req,res) => {
@@ -212,21 +214,25 @@ const authController = {
         res.status(200).send('Success edit user data')
         
     } catch (err) {
-        return res.status(400).send(err)    
+        return res.status(400).send(err.message)    
     }
 
     },
     deleteEmployee: async (req,res) => {
         const id = req.params.id
 
+        const t = await sequelize.transaction();
         try { 
-            const result = await User.destroy({where: {id:id}})
+            const result = await User.destroy({where: {id:id}}, {transaction: t})
             if(!result){
                 throw new Error('Delete employee failed')
             }
+
+            await t.commit();
             res.status(200).send('Success delete employee')
 
         } catch (err) {
+            await t.rollback();
             return res.status(400).send(err)
         }
     }

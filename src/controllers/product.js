@@ -76,7 +76,11 @@ const productController = {
         const page = parseInt(req.query.page) || 1
         const limit = 5
         const search = req.query.search || ""
-        const offset = limit * page
+        const offset = limit * (page - 1)
+
+        const t = await sequelize.transaction();
+
+        try{
         const totalRows = await Product.count({
             where : {
                 [Op.or] : [
@@ -88,7 +92,11 @@ const productController = {
                     }
                 ]
             }
-        })
+        },{transaction : t})
+        if(totalRows == 0) {
+            throw new Error('Fetching data failed')
+        }
+
         const totalPage = Math.ceil(totalRows / limit)
         const result = await Product.findAll({
             where : {
@@ -106,7 +114,11 @@ const productController = {
             order: [
                 ['name']
             ]
-        })
+        }, {transaction: t})
+
+        if(!result){
+            throw new Error('Fetching all product failed')
+        }
 
         res.status(200).json({
             result : result,
@@ -115,6 +127,12 @@ const productController = {
             totalRows: totalRows,
             totalPage: totalPage
         })
+        await t.commit();
+
+    } catch (err) {
+        await t.collback();
+        return res.status(400).send(err.message)
+    }
     },
     fetchProductByCatId: async (req,res) => {
     const catId = req.params.id
@@ -123,6 +141,9 @@ const productController = {
     const limit = 5
     const search = req.query.search || ""
     const offset = limit * (page - 1)
+
+    const t = await sequelize.transaction();
+    try {
     const totalRows = await Product.count({
         where : {
             [Op.and] : [
@@ -141,7 +162,10 @@ const productController = {
                 }
             ]
         }
-    })
+    }, {transaction : t})
+    if(totalRows == 0) {
+        throw new Error('Fetching data failed')
+    }
     const totalPage = Math.ceil(totalRows / limit)
     const result = await Product.findAll({
         where : {
@@ -166,7 +190,10 @@ const productController = {
         order: [
             ['name']
         ]
-    })
+    }, {transaction : t})
+    if(!result){
+        throw new Error('Fetching all product by category failed')
+    }
 
     res.status(200).json({
         result : result,
@@ -175,7 +202,28 @@ const productController = {
         totalRows: totalRows,
         totalPage: totalPage
     })
+    await t.commit();
 
+    } catch (err) {
+        await t.rollback();
+        return res.status(400).send(err.message)
+    }
+
+    },
+    delete: async (req,res) =>{
+        const id = req.params.id
+        
+        try {
+            const result = await Product.destroy({where: {id: id}})
+            if(!result){
+                throw new Error('Delete product failed')
+            }
+
+            res.status(200).send('Delete product success')
+        } catch (err) {
+            console.log(err);
+            return res.status(400).send(err.message)
+        }
     }
 }
 

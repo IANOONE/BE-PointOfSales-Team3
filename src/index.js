@@ -1,13 +1,15 @@
 const express = require("express")
 const app = express()
 const cookie_parser = require('cookie-parser')
-const dotenv = require("dotenv").config()
+require("dotenv").config()
 const PORT = process.env.PORT || 2000
 const route = require("./routes")
 const db = require("./models")
 const {sequelize} = require("./models")
+const cors = require("cors")
 
 
+app.use(cors({credentials: true} ))
 app.use(cookie_parser())
 app.use(express.json())
 app.use(express.urlencoded({extended: false}))

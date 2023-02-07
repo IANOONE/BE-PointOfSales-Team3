@@ -19,6 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     image: DataTypes.STRING
   }, {
     sequelize,
+    paranoid: true,
     modelName: 'Product',
   });
   return Product;
