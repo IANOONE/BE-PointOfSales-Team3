@@ -47,5 +47,5 @@ db.category = require("./category")(sequelize,Sequelize)
 
 // associate
 db.product.belongsTo(db.category)
-
+db.category.hasMany(db.product)
 module.exports = db;

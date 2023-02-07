@@ -1,7 +1,7 @@
 const db = require("../models")
 const Category = db.category
 const Product = db.product
-const {sequelize} = require("../models")
+const {sequelize, Sequelize, product} = require("../models")
 const { Op, where } = require("sequelize")
 const fs = require("fs")
 
@@ -52,6 +52,19 @@ const categoryController = {
             await t.rollback();
             return res.status(400).send(err.message)
         } 
+    },
+    fetchAll: async (req,res) => {
+        const result = await Category.findAll({
+            attributes: ['id', 'name'],
+            include : [{
+                model : product,
+                attributes : ['image'],
+                order: [['id', 'DESC']],
+                limit: 1
+            }],
+        })
+
+        res.status(200).send(result)
     }
 
 }

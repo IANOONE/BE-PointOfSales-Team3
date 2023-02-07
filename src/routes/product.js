@@ -15,4 +15,4 @@ router.get("/list", productController.fetchProduct)
 router.get("/byCategory/:id", productController.fetchProductByCatId)
 router.delete("/delete/:id", productController.delete)
 
-module.exports = router
+module.exports = router 
