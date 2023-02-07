@@ -42,9 +42,6 @@ const authController = {
                     },
                     {
                         phone_number : userLog
-                    },
-                    {
-                        username : userLog
                     }
                 ]
             }
@@ -65,7 +62,9 @@ const authController = {
         const result = {
             ...user.dataValues
         }
-
+    
+        delete result.email
+        delete result.phone_number
         delete result.password
         delete result.refresh_token
         console.log(result);
@@ -83,7 +82,8 @@ const authController = {
         res.cookie(
             'refreshToken', refreshToken,{
             httpOnly: true,
-            maxAge: 1 * 60 * 60 * 1000
+            maxAge: 1 * 60 * 60 * 1000,
+            domain:'localhost:2000/auth/token'
         })
         res.status(200).json({
             accessToken : accessToken,
@@ -100,7 +100,7 @@ const authController = {
         try{
 
             if(!refToken){
-              return new Error('Refresh Token not found')   
+              throw new Error('Refresh Token not found')   
             }
             
             const user = await User.findOne({
@@ -112,27 +112,17 @@ const authController = {
             const data = {
                 ...user.dataValues
             }
+            delete data.email
             delete data.password
             delete data.refresh_token
             
-            const accessToken = jwt.sign({...data}, process.env.secret_key, {expiresIn: '15s'})
+            const accessToken = jwt.sign({...data}, process.env.secret_key, {expiresIn: '5m'})
 
             res.json({
-                accessToken: accessToken
+                accessToken
             })
 
         } catch(err){
-            return res.status(400).send(err)
-        }
-    },
-    fetchAll: async (req,res) => {
-        try {
-            const result = await User.findAll()
-
-            res.status(200).json({
-                data: result
-            })
-        } catch (err) {
             return res.status(400).send(err)
         }
     },
@@ -148,12 +138,95 @@ const authController = {
             })
 
             if(!user) {
-                return new Error('logout failed')
+                throw new Error('logout failed')
             }
 
             res.clearCookie('refreshToken')
             res.status(200).send("success logout")
         } catch(err){
+            return res.status(400).send(err)
+        }
+    },
+    fetchAllEmployee: async (req,res) => {
+        try {
+            const result = await User.findAll({
+                where: {
+                    isAdmin : false
+                }
+            })
+
+            res.status(200).json({
+                data: result
+            })
+        } catch (err) {
+            return res.status(400).send(err)
+        }
+    },
+    fetchDataEmployee: async (req,res) => {
+        const id  = req.params.id
+        try {
+            const user = await User.findOne({
+                where: {id: id}
+            })
+
+            if(!user){
+                throw new Error(`User not found`)
+            }
+
+            const data = {
+                ...user.dataValues
+            }
+            delete data.password
+            delete data.refreshToken
+            delete data.isAdmin
+
+            res.status(200).json({...data})
+        }catch (err) {
+            return res.status(400).send(err)
+        }
+    },
+    editEmployee: async (req,res) => {
+        const id  = req.params.id
+        try {
+        if(req.body.password){
+            const hashPass = bcrypt.hashSync(req.body.password, 10) 
+            const editPass = await User.update({
+                password: hashPass
+            },
+            {
+                where: {
+                    id: id
+                }
+            })
+            if(!editPass){
+                throw new Error('Edit password failed')
+            }
+            res.status(200).send('Success edit password')
+        }
+
+        const data = await User.update({...req.body}, {where: {id : id}})
+
+        if(!data){
+            throw new Error('Edit user data failed')
+        }
+        res.status(200).send('Success edit user data')
+        
+    } catch (err) {
+        return res.status(400).send(err)    
+    }
+
+    },
+    deleteEmployee: async (req,res) => {
+        const id = req.params.id
+
+        try { 
+            const result = await User.destroy({where: {id:id}})
+            if(!result){
+                throw new Error('Delete employee failed')
+            }
+            res.status(200).send('Success delete employee')
+
+        } catch (err) {
             return res.status(400).send(err)
         }
     }

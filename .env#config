@@ -1,0 +1,10 @@
+PORT = 
+secret_key = 
+
+user = 
+pass = 
+database = 
+host = 
+dialect = 
+
+render_img = 
