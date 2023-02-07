@@ -58,7 +58,7 @@ const categoryController = {
             attributes: ['id', 'name'],
             include : [{
                 model : product,
-                attributes : ['image'],
+                attributes : ['image', [sequelize.fn('COUNT', '*'), 'count']],
                 order: [['id', 'DESC']],
                 limit: 1
             }],
