@@ -5,11 +5,11 @@ const {validate, userValidateRules} = require("../middlewares/validator")
 const { tokenVerify, checkRole } = require("../middlewares/verifyToken")
 
 
-router.get("/userList", authController.fetchAllEmployee)
+router.get("/userList", tokenVerify, checkRole, authController.fetchAllEmployee)
 router.post("/register",tokenVerify, checkRole, userValidateRules(), validate, authController.register)
 router.post("/login", authController.login)
 router.get("/token", authController.refreshToken)
-router.delete("/delete/:id", authController.deleteEmployee)
-router.post("/logout", authController.logout)
+router.delete("/delete/:id", tokenVerify, checkRole, authController.deleteEmployee)
+router.post("/logout", tokenVerify, authController.logout)
 
 module.exports = router

@@ -9,10 +9,10 @@ const uploadSingle = fileUploader({destinationFolder : "products_img"}).single('
 const { tokenVerify } = require("../middlewares/verifyToken")
 
 
-router.post("/create", productValidateRules(), validate, uploadSingle , productController.create)
-router.patch("/edit/:id", uploadSingle , productController.edit)
-router.get("/list", productController.fetchProduct)
-router.get("/byCategory/:id", productController.fetchProductByCatId)
-router.delete("/delete/:id", productController.delete)
+router.post("/create", tokenVerify, checkRole, productValidateRules(), validate, uploadSingle , productController.create)
+router.patch("/edit/:id", tokenVerify, checkRole, uploadSingle , productController.edit)
+router.get("/list", tokenVerify, checkRole, productController.fetchProduct)
+router.get("/byCategory/:id", tokenVerify, productController.fetchProductByCatId)
+router.delete("/delete/:id", tokenVerify, checkRole, productController.delete)
 
 module.exports = router 
