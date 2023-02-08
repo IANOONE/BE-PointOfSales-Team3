@@ -3,6 +3,8 @@ const Product = db.product
 const {sequelize} = require("../models")
 const { Op } = require("sequelize")
 const fs = require('fs');
+const { log } = require("console");
+const path = require('path');
 
 const productController = {
     create: async (req,res) => {
@@ -25,15 +27,13 @@ const productController = {
                 ...req.body,
                 image : fileName
             }
-            // console.log(data);
-            // await Product.create({...data}, { transaction: t })
+            console.log(data);
+            await Product.create({...data})
 
-            await t.commit();
             res.status(200).send("Success add new product")
 
         } catch(err){
             console.log(err);
-            await t.rollback();
             return res.status(400).send(err)
         }
     },
@@ -47,14 +47,27 @@ const productController = {
         
         if(req.file){
             // delete previous pic in local file before added new image
-            const deletePic = await Product.findOne({
+            const data = await Product.findOne({
                 where: {
                     id: id
                 }, attributes : ['image']
             }, {transaction: t})
             
-            const urlPic = deletePic.dataValues.image
-            fs.unlinkSync(urlPic)
+            const urlPic = (data.dataValues.image).split("/")[2]
+
+            //create new directory path using library path
+            const dirPath = path.join(__dirname, `/../public/products_img/${urlPic}`);
+
+            console.log(dirPath);
+
+
+          fs.unlink(dirPath, (err)=> {
+            throw new Error(err)
+          })
+
+          console.log(req.file);
+
+            // console.log(res);
 
         // get filename
         let fileName = req.file.filename
@@ -70,7 +83,7 @@ const productController = {
                 ...req.body
             }
         }
-            
+        console.log(data);
             const result = await Product.update({...data},
             {
                 where: {
@@ -84,7 +97,7 @@ const productController = {
             res.status(200).send("Edit product success")
         } catch (err) {
             await t.rollback();
-            return res.status(400).send(err)
+            return res.status(400).send(err.message)
         }
     },
     fetchProduct: async (req,res) => {

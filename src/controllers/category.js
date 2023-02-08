@@ -67,7 +67,7 @@ const categoryController = {
         if(!result){
             return res.status(400).send('Fetching category failed')
         }
-        res.status(200).send(result)
+        res.status(200).send({'result' : result})
     }
 
 }
