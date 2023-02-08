@@ -64,9 +64,9 @@ const categoryController = {
                 limit: 1
             }],
         })
-
-
-
+        if(!result){
+            return res.status(400).send('Fetching category failed')
+        }
         res.status(200).send(result)
     }
 

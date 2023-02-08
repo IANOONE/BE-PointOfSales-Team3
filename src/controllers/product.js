@@ -2,6 +2,7 @@ const db = require("../models")
 const Product = db.product
 const {sequelize} = require("../models")
 const { Op } = require("sequelize")
+const fs = require('fs');
 
 const productController = {
     create: async (req,res) => {
@@ -38,10 +39,23 @@ const productController = {
     },
     edit: async (req,res) => {
         const id = req.params.id
-        let data = {}
 
+        const t = await sequelize.transaction();
+        try{
+        
+        let data = {}
         
         if(req.file){
+            // delete previous pic in local file before added new image
+            const deletePic = await Product.findOne({
+                where: {
+                    id: id
+                }, attributes : ['image']
+            }, {transaction: t})
+            
+            const urlPic = deletePic.dataValues.image
+            fs.unlinkSync(urlPic)
+
         // get filename
         let fileName = req.file.filename
         // rewrite filename and add url
@@ -51,24 +65,25 @@ const productController = {
             ...req.body,
             image: fileName
             }
-        }else {
+        } else {
             data = {
                 ...req.body
             }
         }
-
-        try{
-            await Product.update({
-                ...data
-            },
+            
+            const result = await Product.update({...data},
             {
                 where: {
                     id: id
                 }
-            })
-            res.status(200).send("Success edit product")
+            }, {transaction: t})
+            if(!result) {
+                throw new Error('Edit product failed')
+            }
+            await t.commit();
+            res.status(200).send("Edit product success")
         } catch (err) {
-            console.log(err);
+            await t.rollback();
             return res.status(400).send(err)
         }
     },
@@ -77,6 +92,8 @@ const productController = {
         const limit = 5
         const search = req.query.search || ""
         const offset = limit * (page - 1)
+        const sortBy = req.query.sortBy || "name"
+        const order = req.query.order || "ASC"
 
         const t = await sequelize.transaction();
 
@@ -112,7 +129,7 @@ const productController = {
             offset: offset,
             limit: limit,
             order: [
-                ['name']
+                [sortBy, order]
             ]
         }, {transaction: t})
 
