@@ -4,6 +4,7 @@ const Product = db.product
 const {sequelize, Sequelize, product} = require("../models")
 const { Op, where } = require("sequelize")
 const fs = require("fs")
+const { log } = require("console")
 
 const categoryController = {
     create: async (req,res) => {
@@ -57,12 +58,14 @@ const categoryController = {
         const result = await Category.findAll({
             attributes: ['id', 'name'],
             include : [{
-                model : product,
+                model : product, as : 'product',
                 attributes : ['image', [sequelize.fn('COUNT', '*'), 'count']],
                 order: [['id', 'DESC']],
                 limit: 1
             }],
         })
+
+
 
         res.status(200).send(result)
     }

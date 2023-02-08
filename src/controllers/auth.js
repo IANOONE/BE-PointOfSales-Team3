@@ -9,7 +9,7 @@ const jwt = require("jsonwebtoken")
 const authController = {
     register: async (req,res) => {
         const {password} = req.body
-        try{
+        try{    
             const hashPass = bcrypt.hashSync(password, 10)
 
             // added hash password to the object data, and replace password value from req.body
@@ -63,7 +63,7 @@ const authController = {
             ...user.dataValues
         }
 
-        const arrDelete = ['email', 'phone_number', 'password', 'refresh_token', 'createdAt', 'updatedAt', 'deletedAt' ]
+        const arrDelete = ['email', 'phone_number', 'password', 'refresh_token', 'createdAt', 'updatedAt', 'deletedAt']
         arrDelete.forEach(e => {
             delete result[e]
         });
@@ -84,7 +84,6 @@ const authController = {
             'refreshToken', refreshToken,{
             httpOnly: true,
             maxAge: 1 * 60 * 60 * 1000,
-            domain:'localhost:2000/auth/token'
         })
         res.status(200).json({
             accessToken : accessToken,
@@ -174,13 +173,15 @@ const authController = {
             if(!user){
                 throw new Error(`User not found`)
             }
-
-            const data = {
+            
+            const result = {
                 ...user.dataValues
             }
-            delete data.password
-            delete data.refreshToken
-            delete data.isAdmin
+
+            const arrDelete = ['password', 'isAdmin', 'refresh_token', 'createdAt', 'updatedAt', 'deletedAt']
+        arrDelete.forEach(e => {
+            delete result[e]
+        });
 
             res.status(200).json({...data})
         }catch (err) {
@@ -221,19 +222,16 @@ const authController = {
     deleteEmployee: async (req,res) => {
         const id = req.params.id
 
-        const t = await sequelize.transaction();
         try { 
-            const result = await User.destroy({where: {id:id}}, {transaction: t})
+            const result = await User.destroy({where: {id:id}})
             if(!result){
                 throw new Error('Delete employee failed')
             }
 
-            await t.commit();
             res.status(200).send('Success delete employee')
 
         } catch (err) {
-            await t.rollback();
-            return res.status(400).send(err)
+            return res.status(400).send(err.message)
         }
     }
     
