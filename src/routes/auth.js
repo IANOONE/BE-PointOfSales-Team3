@@ -10,6 +10,6 @@ router.post("/register",tokenVerify, checkRole, userValidateRules(), validate, a
 router.post("/login", authController.login)
 router.get("/token", authController.refreshToken)
 router.delete("/delete/:id", tokenVerify, checkRole, authController.deleteEmployee)
-router.post("/logout", tokenVerify, authController.logout)
+router.post("/logout", authController.logout)
 
 module.exports = router

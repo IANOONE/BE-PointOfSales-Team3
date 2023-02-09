@@ -23,7 +23,7 @@ const tokenVerify = (req,res, next) => {
 
     const verifyUser = jwt.verify(token, process.env.secret_key)
 
-    req.user = verifyUser.dataValues
+    req.user = verifyUser
     next()
 
     }catch(err){
