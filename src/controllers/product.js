@@ -102,7 +102,7 @@ const productController = {
     },
     fetchProduct: async (req,res) => {
         const page = parseInt(req.query.page) || 1
-        const limit = 5
+        const limit = 24
         const search = req.query.search || ""
         const offset = limit * (page - 1)
         const sortBy = req.query.sortBy || "name"
@@ -168,7 +168,7 @@ const productController = {
     const catId = req.params.id
     console.log(catId);
     const page = parseInt(req.query.page) || 1
-    const limit = 5
+    const limit = 18
     const search = req.query.search || ""
     const offset = limit * (page - 1)
 

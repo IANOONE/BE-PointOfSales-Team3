@@ -43,9 +43,19 @@ db.Sequelize = Sequelize;
 db.user = require("./user")(sequelize,Sequelize)
 db.product = require("./product")(sequelize,Sequelize)
 db.category = require("./category")(sequelize,Sequelize)
+db.transaction = require("./transaction")(sequelize,Sequelize)
+db.transaction_detail = require("./transaction_detail")(sequelize,Sequelize)
 
 
 // associate
 db.product.belongsTo(db.category)
 db.category.hasMany(db.product, {as: 'product'})
+db.transaction.hasMany(db.transaction_detail)
+db.transaction_detail.belongsTo(db.transaction)
+db.transaction.belongsTo(db.user)
+db.user.hasMany(db.transaction)
+db.transaction_detail.belongsTo(db.product)
+db.product.hasMany(db.transaction_detail)
+
+
 module.exports = db;
