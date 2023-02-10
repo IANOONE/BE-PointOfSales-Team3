@@ -3,7 +3,6 @@ const Product = db.product
 const {sequelize} = require("../models")
 const { Op } = require("sequelize")
 const fs = require('fs');
-const { log } = require("console");
 const path = require('path');
 
 const productController = {
