@@ -49,7 +49,7 @@ const authController = {
         
         
         if(!user){
-            throw new Error('Login failed. Email/username/phone number is not registered')
+            throw new Error('Login failed. Email/phone number is not registered')
         }
         //verify password and comparing with decrypted password
         const verifyPass = bcrypt.compareSync(password, user.password)
@@ -70,7 +70,7 @@ const authController = {
 
         console.log(result);
 
-        const accessToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "5m"})
+        const accessToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "1h"})
 
         const refreshToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "1h"})
         

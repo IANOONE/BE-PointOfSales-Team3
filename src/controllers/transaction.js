@@ -10,6 +10,7 @@ const transactionController = {
     create: async (req,res) => {
         const grand_total = req.body.grand_total
         const data = req.body.data
+        const id = req.user.id
 
         const t = await sequelize.transaction();
         try {
@@ -22,13 +23,12 @@ const transactionController = {
             countOrder = countOrder + 1
             
         const dateNow = moment().format('DDMMYYYY')
-        const id = 1
         
-        const no_trans = dateNow + '000' + countOrder + "0" + id 
+        const no_trans = dateNow + '000' + countOrder + "0" + id
         console.log(no_trans);
+        // console.log(userId);
         
-        
-        const transHead = await Transaction.create({"no_trans" : no_trans , "grand_total" : grand_total}, { transaction: t })
+        const transHead = await Transaction.create({"no_trans" : no_trans , "grand_total" : grand_total, "UserId" : id}, { transaction: t })
         if(!transHead){
             throw new Error('Create transaction failed')
         }

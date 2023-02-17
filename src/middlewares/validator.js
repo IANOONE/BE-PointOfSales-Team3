@@ -28,7 +28,15 @@ const userValidateRules =  () => {
                 }
             })
         }),
-        body('password').isLength({min: 8, max: 16}).withMessage("Password length must be between 8 - 16 characters").custom((value, {req}) => value === req.body.passwordConfirm).withMessage("Password and Password confirmation not match")  
+        body('password').custom((value, {req}) => { 
+            if(value.length < 8 || value.length > 16) {
+                return Promise.reject('Password length must be between 8 - 16 characters');
+            } else if (value !== req.body.passwordConfirm) {
+                return Promise.reject('Password confirmation is incorrect');
+          } else {
+           return true
+          }
+        }) 
     ]
 }
 const productValidateRules = () => {
@@ -69,7 +77,7 @@ const validate = (req,res,next) => {
     if(!errors.isEmpty()){
 
         return res.status(400).json({ 
-            errors: errors.array()[0].msg
+            errors: errors.array()
         });
     }
 
