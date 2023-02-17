@@ -52,32 +52,21 @@ const transactionController = {
     },
     fetchAll: async (req,res) => {
         const page =  parseInt(req.query.page) || 1
-        const limit = 20
-        const search = req.query.search || ""
-        const employeeName = req.query.employeeName || ""
+        const limit = 5
+        const search = req.query.searchDate || ""
         const offset = limit * (page - 1)
         const sortBy = req.query.sortBy || "updatedAt"
         const order = req.query.order || "DESC"
 
+        // console.log(employeeName);
+        
         const t = await sequelize.transaction();
         try {
-        const userData = await User.findOne({where: {name: employeeName}})
-        console.log(userData.dataValues.id);
-
-        const totalRows = await Transaction.count({
+            const totalRows = await Transaction.count({
             where : {
-                [Op.or] : [
-                    {
                         updatedAt : {[Op.substring] : [search]} 
-                    },
-                    {
-                        UserId : userData.dataValues.id  
-                    }
-                ]
-            }, 
-            transaction : t
-            
-        })
+                    }, transaction : t })
+
         if(totalRows == 0) {
             throw new Error('Fetching data failed')
         }
@@ -86,14 +75,7 @@ const transactionController = {
 
         const result = await Transaction.findAll({
             where : {
-                [Op.or] : [
-                    {
-                        updatedAt : {[Op.substring] : search} 
-                    },
-                    {
-                        UserId : userData.dataValues.id  
-                    }
-                ]
+                        updatedAt : {[Op.substring] : [search]} 
             },
             offset : offset,
             limit : limit,
