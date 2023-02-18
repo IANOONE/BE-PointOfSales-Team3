@@ -70,7 +70,7 @@ const authController = {
 
         console.log(result);
 
-        const accessToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "1h"})
+        const accessToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "5m"})
 
         const refreshToken = jwt.sign({...result}, process.env.secret_key, {expiresIn: "1h"})
         
